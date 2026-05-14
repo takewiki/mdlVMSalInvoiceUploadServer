@@ -145,6 +145,29 @@ SalInvoiceViewServer <- function(input, output, session, dms_token, erp_token) {
 
     tsui::run_dataTable2(id = 'SalInvoice_resultView',data = data)
 
+    tsui::run_download_xlsx(id = 'dl_SalInvoice_view',data = data,filename='发票明细.xlsx')
+
+
+
+  })
+
+  shiny::observeEvent(input$btn_SalInvoice_view_sum, {
+
+
+
+    text_SalInvoice_Invoice = tsui::var_text("text_SalInvoice_Invoice")
+
+    date_SalInvoice_Date = tsui::var_dateRange('date_SalInvoice_Date')
+    FInvoice=text_SalInvoice_Invoice()
+
+    FStartDate=date_SalInvoice_Date()[1]
+    FEndDate=date_SalInvoice_Date()[2]
+
+    data = mdlVMSalInvoiceUploadPkg::SalInvoice_select_sum(erp_token = erp_token,FInvoice = FInvoice,FStartDate = FStartDate,FEndDate = FEndDate)
+
+    tsui::run_dataTable2(id = 'SalInvoice_resultView',data = data)
+    tsui::run_download_xlsx(id = 'dl_SalInvoice_view_sum',data = data,filename='发票汇总.xlsx')
+
 
 
   })
