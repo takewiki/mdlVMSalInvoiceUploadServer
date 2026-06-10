@@ -33,9 +33,9 @@ SalInvoiceUploadServer <- function(input, output, session, dms_token, erp_token)
         if (is.null(cell) || nrow(cell) == 0) NA else as.character(cell[1, 1])
       }, error = function(e) NA)
 
-      # 2. 读取 L7 -> FDate（原为 L10，现改为 L7）
+      # 2. 读取 L10 -> FDate
       FDate_raw <- tryCatch({
-        cell <- openxlsx::read.xlsx(f, colNames = FALSE, rows = 7:7, cols = 12:12, detectDates = TRUE)
+        cell <- openxlsx::read.xlsx(f, colNames = FALSE, rows = 10:10, cols = 12:12, detectDates = TRUE)
         if (is.null(cell) || nrow(cell) == 0) NA else cell[1, 1]
       }, error = function(e) NA)
 
@@ -45,8 +45,8 @@ SalInvoiceUploadServer <- function(input, output, session, dms_token, erp_token)
         else as.character(FDate_raw)
       } else NA
 
-      # 3. 提取 G、J、K 列从第14行开始（原为17行）直到 G 列首次为空
-      start_row <- 14
+      # 3. 提取 G、J、K 列从第17行开始直到 G 列首次为空
+      start_row <- 17
       max_check_row <- 10000
       last_data_row <- start_row - 1
 
@@ -91,15 +91,19 @@ SalInvoiceUploadServer <- function(input, output, session, dms_token, erp_token)
             stringsAsFactors = FALSE
           )
 
-          tsda::db_writeTable2(token = erp_token, table_name = 'rds_t_vm_SalInvoice_input', r_object = data, append = TRUE)
+          tsda::db_writeTable2(token = erp_token,table_name = 'rds_t_vm_SalInvoice_input',r_object = data,append = TRUE)
 
           mdlVMSalInvoiceUploadPkg::SalInvoice_upload(erp_token = erp_token)
+
+
+
+
 
         } else {
           print("警告: 批量读取 G/J/K 区域失败")
         }
       } else {
-        print("提示: 从第14行开始 G 列为空或文件行数不足，无数据可提取")
+        print("提示: 从第17行开始 G 列为空或文件行数不足，无数据可提取")
       }
     }
 
@@ -108,6 +112,7 @@ SalInvoiceUploadServer <- function(input, output, session, dms_token, erp_token)
     print("===== 处理完成 =====")
   })
 }
+
 
 
 #' 处理逻辑
@@ -146,6 +151,23 @@ SalInvoiceViewServer <- function(input, output, session, dms_token, erp_token) {
 
   })
 
+
+  shiny::observeEvent(input$btn_SalInvoice_delete, {
+
+
+
+    text_SalInvoice_Invoice_delete = tsui::var_text("text_SalInvoice_Invoice_delete")
+    FInvoice=text_SalInvoice_Invoice_delete()
+
+
+    mdlVMSalInvoiceUploadPkg::SalInvoice_delete(erp_token = erp_token,FInvoice = FInvoice)
+
+    tsui::pop_notice("删除成功")
+
+
+
+  })
+
   shiny::observeEvent(input$btn_SalInvoice_view_sum, {
 
 
@@ -169,6 +191,8 @@ SalInvoiceViewServer <- function(input, output, session, dms_token, erp_token) {
 
 
   shiny::observeEvent(input$btn_SalInvoice_Compute, {
+
+    tsui::pop_notice2('开始计算')
 
     date_SalInvoice_FDate = tsui::var_date('date_SalInvoice_FDate')
 
