@@ -192,7 +192,7 @@ SalInvoiceViewServer <- function(input, output, session, dms_token, erp_token) {
 
   shiny::observeEvent(input$btn_SalInvoice_Compute, {
 
-    tsui::pop_notice2('开始计算')
+    #tsui::pop_notice2('开始计算')
 
     date_SalInvoice_FDate = tsui::var_date('date_SalInvoice_FDate')
 
