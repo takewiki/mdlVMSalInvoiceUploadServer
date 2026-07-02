@@ -38,13 +38,6 @@ SalInvoiceUploadServer <- function(input, output, session, dms_token, erp_token)
         cell <- openxlsx::read.xlsx(f, colNames = FALSE, rows = 7:7, cols = 12:12, detectDates = TRUE)
         if (is.null(cell) || nrow(cell) == 0) NA else cell[1, 1]
       }, error = function(e) NA)
-
-      FDate <- if (!is.na(FDate_raw)) {
-        if (inherits(FDate_raw, "Date")) as.character(FDate_raw)
-        else if (is.numeric(FDate_raw) && FDate_raw > 1) as.character(openxlsx::convertToDate(FDate_raw))
-        else as.character(FDate_raw)
-      } else NA
-
       # 3. 提取 G、J、K 列从第17行开始直到 G 列首次为空
       start_row <- 14
       max_check_row <- 10000
