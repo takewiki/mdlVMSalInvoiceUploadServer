@@ -33,9 +33,9 @@ SalInvoiceUploadServer <- function(input, output, session, dms_token, erp_token)
         if (is.null(cell) || nrow(cell) == 0) NA else as.character(cell[1, 1])
       }, error = function(e) NA)
 
-      # 2. 读取 L10 -> FDate
-      FDate_raw <- tryCatch({
-        cell <- openxlsx::read.xlsx(f, colNames = FALSE, rows = 10:10, cols = 12:12, detectDates = TRUE)
+      # 2. 读取 L7 -> FDate（原为 L10，现改为 L7，即 rows = 7:7）
+      FDate <- tryCatch({
+        cell <- openxlsx::read.xlsx(f, colNames = FALSE, rows = 7:7, cols = 12:12, detectDates = TRUE)
         if (is.null(cell) || nrow(cell) == 0) NA else cell[1, 1]
       }, error = function(e) NA)
 
@@ -46,7 +46,7 @@ SalInvoiceUploadServer <- function(input, output, session, dms_token, erp_token)
       } else NA
 
       # 3. 提取 G、J、K 列从第17行开始直到 G 列首次为空
-      start_row <- 17
+      start_row <- 14
       max_check_row <- 10000
       last_data_row <- start_row - 1
 
