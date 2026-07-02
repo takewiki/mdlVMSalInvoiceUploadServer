@@ -34,11 +34,30 @@ SalInvoiceUploadServer <- function(input, output, session, dms_token, erp_token)
       }, error = function(e) NA)
 
       # 2. 读取 L7 -> FDate（原为 L10，现改为 L7，即 rows = 7:7）
-      FDate <- tryCatch({
+      FDate_raw <- tryCatch({
         cell <- openxlsx::read.xlsx(f, colNames = FALSE, rows = 7:7, cols = 12:12, detectDates = TRUE)
         if (is.null(cell) || nrow(cell) == 0) NA else cell[1, 1]
       }, error = function(e) NA)
 
+      # ---- 增强的日期转换逻辑 ----
+      FDate <- tryCatch({
+        if (is.na(FDate_raw)) {
+          NA_character_
+        } else {
+          # 统一尝试转换为 Date 对象
+          d <- if (inherits(FDate_raw, "Date")) {
+            FDate_raw
+          } else if (is.numeric(FDate_raw) && FDate_raw > 1) {
+            openxlsx::convertToDate(FDate_raw)
+          } else {
+            # 尝试将字符型（如 "2026/7/2" 或 "02-07-2026"）转为 Date
+            as.Date(FDate_raw)
+          }
+          # 若转换成功则格式化为 yyyy-mm-dd，否则返回 NA
+          if (!is.na(d)) format(d, "%Y-%m-%d") else NA_character_
+        }
+      }, error = function(e) NA_character_)
+      # ---------------------------------
       # 3. 提取 G、J、K 列从第17行开始直到 G 列首次为空
       start_row <- 14
       max_check_row <- 10000
