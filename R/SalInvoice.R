@@ -38,6 +38,7 @@ SalInvoiceUploadServer <- function(input, output, session, dms_token, erp_token)
         cell <- openxlsx::read.xlsx(f, colNames = FALSE, rows = 7:7, cols = 12:12, detectDates = TRUE)
         if (is.null(cell) || nrow(cell) == 0) NA else cell[1, 1]
       }, error = function(e) NA)
+
       # 3. 提取 G、J、K 列从第17行开始直到 G 列首次为空
       start_row <- 14
       max_check_row <- 10000
@@ -191,6 +192,7 @@ SalInvoiceViewServer <- function(input, output, session, dms_token, erp_token) {
 
 
     FDate=date_SalInvoice_FDate()
+    #print(FDate)
     data = mdlVMSalInvoiceUploadPkg::SalInvoice_Compute(erp_token = erp_token,FDate = FDate)
 
     tsui::run_dataTable2(id = 'SalInvoice_resultView',data = data)
