@@ -13,6 +13,7 @@
 #' SalInvoiceServer()
 SalInvoiceUploadServer <- function(input, output, session, dms_token, erp_token) {
 
+
   shiny::observeEvent(input$btn_SalInvoice_click, {
     multi_files_SalInvoice <- tsui::var_files('multi_files_SalInvoice')
     fileNames <- multi_files_SalInvoice()
@@ -25,18 +26,19 @@ SalInvoiceUploadServer <- function(input, output, session, dms_token, erp_token)
     print("===== 开始处理上传的Excel文件 =====")
 
     for (f in fileNames) {
-      cat("\n文件:", basename(f), "\n")
 
       # 1. 读取 K5 -> FInvoice
       FInvoice <- tryCatch({
         cell <- openxlsx::read.xlsx(f, colNames = FALSE, rows = 5:5, cols = 11:11)
+
         if (is.null(cell) || nrow(cell) == 0) NA else as.character(cell[1, 1])
       }, error = function(e) NA)
 
-      # 读取第7行第12列（L列）的原始内容
+      # 读取L7 的原始内容
       whole <- readxl::read_excel(f,sheet = 1,col_names = FALSE, range = "A1:L7")
       FDate <-  whole[7, 12][[1]]
       FDate <- as.Date(FDate)
+
       # ---------------------------------
       # 3. 提取 G、J、K 列从第17行开始直到 G 列首次为空
       start_row <- 14
@@ -208,6 +210,32 @@ SalInvoiceViewServer <- function(input, output, session, dms_token, erp_token) {
 
   })
 
+
+
+
+  shiny::observeEvent(input$btn_SalInvoice_Difference, {
+
+
+    date_SalInvoice_FDate = tsui::var_date('date_SalInvoice_FDate')
+
+
+    FDate=date_SalInvoice_FDate()
+    #print(FDate)
+    data = mdlVMSalInvoiceUploadPkg::SalInvoice_difference_select(erp_token = erp_token,FDate = FDate)
+
+    tsui::run_dataTable2(id = 'SalInvoice_resultView',data = data)
+
+    # 假设 FDate 是 Date 类型
+
+    FDate <- format(FDate, "%Y%m")
+
+    filename = paste0(FDate,'异常数据','.xlsx')
+
+    tsui::run_download_xlsx(id = 'dl_Difference',data = data,filename)
+
+
+
+  })
 
 
 }
