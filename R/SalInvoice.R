@@ -231,7 +231,7 @@ SalInvoiceViewServer <- function(input, output, session, dms_token, erp_token) {
 
     filename = paste0(FDate,'异常数据','.xlsx')
 
-    tsui::run_download_xlsx(id = 'dl_Difference',data = data,filename)
+    tsui::run_download_xlsx(id = 'dl_SalInvoice_Difference',data = data,filename)
 
 
 
