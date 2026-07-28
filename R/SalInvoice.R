@@ -253,6 +253,59 @@ SalInvoiceViewServer <- function(input, output, session, dms_token, erp_token) {
 #' @export
 #'
 #' @examples
+#' SalInvoiceUpdateServer()
+SalInvoiceUpdateServer <- function(input, output, session, dms_token, erp_token) {
+
+  shiny::observeEvent(input$btn_SalInvoice_Note_update, {
+
+
+
+    text_SalInvoice_FBillNo = tsui::var_text("text_SalInvoice_FBillNo")
+
+    text_SalInvoice_FNote = tsui::var_text('text_SalInvoice_FNote')
+
+
+    FBillNo = text_SalInvoice_FBillNo()
+    FNote = text_SalInvoice_FNote()
+
+
+    res = mdlVMSalInvoiceUploadPkg::SalOutStock_update(erp_token = erp_token,FBillNo = FBillNo,FNote = FNote)
+
+
+    if (res$Result == 1) {
+
+      tsui::pop_notice(res$Message)
+
+    } else {
+      tsui::pop_notice(res$Message)
+    }
+
+
+
+
+
+
+
+
+  })
+
+
+}
+
+
+
+
+#' 处理逻辑
+#'
+#' @param input 输入
+#' @param output 输出
+#' @param session 会话
+#' @param erp_token 口令
+#'
+#' @return 返回值
+#' @export
+#'
+#' @examples
 #' SalInvoiceServer()
 SalInvoiceServer <- function(input, output, session, dms_token, erp_token) {
   SalInvoiceUploadServer(input = input, output = output, session = session, dms_token = dms_token, erp_token = erp_token)
@@ -260,4 +313,6 @@ SalInvoiceServer <- function(input, output, session, dms_token, erp_token) {
 
 
   SalInvoiceViewServer(input = input, output = output, session = session, dms_token = dms_token, erp_token = erp_token)
+
+  SalInvoiceUpdateServer(input = input, output = output, session = session, dms_token = dms_token, erp_token = erp_token)
 }
